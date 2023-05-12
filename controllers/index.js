@@ -19,3 +19,9 @@ exports.getReviewID = (req, res, next) => {
     })
 }
 
+// exports.invalidID = (req, res, next) => {
+//     checkReviewIDExists().then((nullReview) => {
+//         res.status(404).send({ nullReview, msg: 'review ID not found'})
+//     })
+// }
+
