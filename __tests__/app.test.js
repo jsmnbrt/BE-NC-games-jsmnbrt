@@ -39,8 +39,6 @@ describe("404 error handling", () => {
 describe("GET/api/reviews/:review_id", () => {
     test("GET - status: 200 - responds with review object", () => {
         return request(app).get('/api/reviews/1').expect(200).then((res) => {
-            
-            console.log(res.body)
             const review = res.body.review
             expect(review.review_id).toBe(1);
             expect(review.title).toBe('Agricola')
@@ -53,13 +51,18 @@ describe("GET/api/reviews/:review_id", () => {
             expect(review.created_at).toBe('2021-01-18T10:00:20.514Z')
         })
     })
-    
-
     test("GET - status: 400 - respond with Bad Request", () => {
         return request(app)
         .get('/api/reviews/asdfghjk').expect(400)
         .then((res) => {
             expect(res.body.msg).toBe('Invalid input')
+        });
+    });
+    test("GET - status: 404 - respond with not found", () => {
+        return request(app)
+        .get('/api/reviews/999999').expect(404)
+        .then((res) => {
+            expect(res.body.msg).toBe('Not Found')
         });
     });
 });
