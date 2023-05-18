@@ -78,12 +78,13 @@ describe("GET /api/reviews/:review_id", () => {
 });
 
 describe("GET /api/reviews", () => {
-  xtest("GET - status: 200 - returns an array of review objects", () => {
+  test("GET - status: 200 - returns an array of review objects", () => {
     return request(app)
       .get("/api/reviews")
       .expect(200)
       .then((res) => {
-        const reviews = res.body.reviews;
+        console.log(res.body);
+        const reviews = res.body[0].reviews;
         expect(Array.isArray(reviews)).toBe(true);
         expect(reviews.length).toBeGreaterThan(0);
         reviews.forEach((review) => {
@@ -91,7 +92,6 @@ describe("GET /api/reviews", () => {
           expect(review).toHaveProperty(`designer`);
           expect(review).toHaveProperty(`owner`);
           expect(review).toHaveProperty(`review_img_url`);
-          expect(review).toHaveProperty(`review_body`);
           expect(review).toHaveProperty(`category`);
           expect(review).toHaveProperty(`created_at`);
           expect(review).toHaveProperty(`votes`);

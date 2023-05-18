@@ -1,6 +1,5 @@
 const db = require("../db/connection");
 
-
 exports.fetchCategories = () => {
   return db.query(`SELECT * FROM categories;`).then((res) => {
     return res.rows;
@@ -27,15 +26,11 @@ exports.selectReviewByID = (reviewID) => {
 exports.fetchReviews = () => {
   return db
     .query(
-      `
-    SELECT * FROM reviews
-    FROM reviews
-    LEFT JOIN comments ON reviews.review_id = comments.review_id
-    ORDER BY reviews.created_at DESC`
+      `SELECT owner, title, reviews.review_id, category, review_img_url, reviews.created_at, reviews.votes, designer, COUNT(comments.review_id)::INT as comment_count FROM reviews LEFT JOIN comments ON reviews.review_id = comments.review_id GROUP BY reviews.review_id ORDER BY reviews.created_at DESC;`
     )
     .then((res) => {
-      console.log(res.body );
-      return res.body;
+      
+      return res.rows;
     });
 };
 
