@@ -1,6 +1,7 @@
 const { fetchCategories } = require("../models/index");
 const { selectReviewByID } = require("../models/index");
 const { fetchReviews } = require("../models/index");
+const { fetchComments } = require("../models/index");
 
 exports.getCategories = (req, res, next) => {
   fetchCategories()
@@ -33,3 +34,13 @@ exports.getReviews = (req, res, next) => {
     });
 };
 
+exports.getComments = (req, res, next) => {
+  const { review_id } = req.params;
+  fetchComments(review_id)
+    .then((comments) => {
+      res.status(200).send({ comments: comments });
+    })
+    .catch((err) => {
+      next(err);
+    });
+};

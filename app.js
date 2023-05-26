@@ -3,10 +3,12 @@ const app = express();
 const { getCategories } = require("./controllers/index");
 const { getReviewID } = require("./controllers/index");
 const { getReviews } = require("./controllers/index");
+const { getComments } = require("./controllers/index");
 
 app.get("/api/categories", getCategories);
 app.get("/api/reviews/:review_id", getReviewID);
 app.get("/api/reviews", getReviews);
+app.get("/api/reviews/:review_id/comments", getComments);
 
 app.use("*", (req, res) => {
   res.status(404).send({ msg: "404 - invalid path" });

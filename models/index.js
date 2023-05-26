@@ -29,11 +29,18 @@ exports.fetchReviews = () => {
       `SELECT owner, title, reviews.review_id, category, review_img_url, reviews.created_at, reviews.votes, designer, COUNT(comments.review_id)::INT as comment_count FROM reviews LEFT JOIN comments ON reviews.review_id = comments.review_id GROUP BY reviews.review_id ORDER BY reviews.created_at DESC;`
     )
     .then((res) => {
-      
       return res.rows;
     });
 };
 
-//maybe this isnt bringing back an array?
-// COUNT(comments.comment_id) AS comment_count
-// don't forget to remove review body for each review
+exports.fetchComments = (review_id) => {
+  return db
+    .query(
+      `SELECT comments.comment_id, comments.votes, comments.created_at, comments.author, comments.body, comments.review_id FROM comments WHERE comments.review_id = $1 ORDER BY comments.created_at DESC;`,
+      [review_id]
+    )
+    .then((res) => {
+      console.log(res.rows);
+      return res.rows;
+    });
+};
