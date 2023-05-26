@@ -40,7 +40,6 @@ exports.fetchComments = (review_id) => {
       [review_id]
     )
     .then((res) => {
-      console.log(res.rows);
       return res.rows;
     });
 };
