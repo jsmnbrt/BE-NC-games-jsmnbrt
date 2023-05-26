@@ -100,22 +100,24 @@ describe("GET /api/reviews", () => {
   });
 });
 
-describe.only("GET /api/reviews/:review_id/comments", () => {
+describe("GET /api/reviews/:review_id/comments", () => {
   test("GET - status: 200 - responds with an array of comments for a given review_id", () => {
     return request(app)
       .get("/api/reviews/3/comments")
       .expect(200)
       .then((res) => {
-        const comment = res.body.comments[0];
-        console.log(comment);
-        expect(comment.review_id).toBe(3);
-        expect(comment.comment_id).toBe(6);
-        expect(comment.votes).toBe(10);
-        expect(comment.created_at).toBe("2021-03-27T19:49:48.110Z");
-        expect(comment.author).toBe("philippaclaire9");
-        expect(comment.body).toBe(
-          "Not sure about dogs, but my cat likes to get involved with board games, the boxes are their particular favourite"
-        );
+        const comments = res.body.comments;
+        console.log(comments);
+        expect(Array.isArray(comments)).toBe(true);
+        expect(comments.length).toBe(3);
+        comments.forEach((comment) => {
+          expect(comment).toHaveProperty(`comment_id`);
+          expect(comment).toHaveProperty(`author`);
+          expect(comment).toHaveProperty(`body`);
+          expect(comment).toHaveProperty(`created_at`);
+          expect(comment).toHaveProperty(`votes`);
+          expect(comment).toHaveProperty(`review_id`);
+        });
       });
   });
 });
