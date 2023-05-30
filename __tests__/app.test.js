@@ -12,6 +12,17 @@ afterAll(() => {
   db.end();
 });
 
+describe("404 error handling", () => {
+  test("responds with 404 for invalid path", () => {
+    return request(app)
+      .get("/api/nonsense")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("404 - invalid path");
+      });
+  });
+});
+
 describe("GET/api/categories", () => {
   test("responds with an array of category objects with the properties of `slug` and `description`", () => {
     return request(app)
@@ -24,17 +35,6 @@ describe("GET/api/categories", () => {
           expect(category).toHaveProperty("slug");
           expect(category).toHaveProperty("description");
         });
-      });
-  });
-});
-
-describe("404 error handling", () => {
-  test("responds with 404 for invalid path", () => {
-    return request(app)
-      .get("/api/nonsense")
-      .expect(404)
-      .then(({ body }) => {
-        expect(body.msg).toBe("404 - invalid path");
       });
   });
 });
@@ -83,7 +83,6 @@ describe("GET /api/reviews", () => {
       .get("/api/reviews")
       .expect(200)
       .then((res) => {
-        console.log(res.body);
         const reviews = res.body[0].reviews;
         expect(Array.isArray(reviews)).toBe(true);
         expect(reviews.length).toBeGreaterThan(0);
@@ -107,7 +106,6 @@ describe("GET /api/reviews/:review_id/comments", () => {
       .expect(200)
       .then((res) => {
         const comments = res.body.comments;
-        console.log(comments);
         expect(Array.isArray(comments)).toBe(true);
         expect(comments.length).toBe(3);
         comments.forEach((comment) => {
@@ -118,6 +116,81 @@ describe("GET /api/reviews/:review_id/comments", () => {
           expect(comment).toHaveProperty(`votes`);
           expect(comment).toHaveProperty(`review_id`);
         });
+      });
+  });
+});
+
+describe("POST /api/reviews/:review_id/comments", () => {
+  test("posts a comment to a particular review_id", () => {
+    const newComment = {
+      body: "the body!",
+      username: "bainesface",
+    };
+    return request(app)
+      .post("/api/reviews/1/comments")
+      .expect(201)
+      .send(newComment)
+      .then(({ body }) => {
+        expect(body.body).toBe("the body!");
+        expect(body.author).toBe("bainesface");
+      });
+  });
+
+  test("POST - status: 404 - responds with username not found", () => {
+    return request(app)
+      .post("/api/reviews/9999999/comments")
+      .expect(404)
+      .send({ body: "the body!", username: "9999999" })
+      .then((res) => {
+        expect(res.body.msg).toBe("Invalid username");
+      });
+  });
+
+  test("POST - status: 400 - responds with 'Invalid input'", () => {
+    return request(app)
+      .post("/api/reviews/1/comments")
+      .expect(400)
+      .send({ body: "", username: "" })
+      .then(({ body }) => {
+        expect(body.msg).toBe("Invalid input");
+      });
+  });
+});
+
+describe("PATCH /api/reviews/:review_id", () => {
+  test("updates the votes property of a review", () => {
+    const reviewId = 1;
+    const newVotes = 5;
+    return request(app)
+      .patch(`/api/reviews/${reviewId}`)
+      .send({ inc_votes: newVotes })
+      .expect(200)
+      .then((res) => {
+        expect(res.body.review.votes).toBe(6);
+      });
+  });
+  test("responds with 404 if review is not found", () => {
+    const reviewId = 9999999;
+    const newVotes = 5;
+
+    return request(app)
+      .patch(`/api/reviews/${reviewId}`)
+      .send({ inc_votes: newVotes })
+      .expect(404)
+      .then((res) => {
+        expect(res.body.msg).toBe("404 - review not found");
+      });
+  });
+  test("responds with 400 if invalid input is provided", () => {
+    const reviewId = 1;
+    const newVotes = "invalid";
+
+    return request(app)
+      .patch(`/api/reviews/${reviewId}`)
+      .send({ inc_votes: newVotes })
+      .expect(400)
+      .then((res) => {
+        expect(res.body.msg).toBe("Invalid input");
       });
   });
 });
